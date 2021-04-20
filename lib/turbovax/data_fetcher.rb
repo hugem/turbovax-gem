@@ -1,15 +1,24 @@
+require "date"
+require "faraday"
+
 module Turbovax
   class DataFetcher
-    DEFAULT_REQUEST_TIMEOUT = 5.seconds
+    DEFAULT_REQUEST_TIMEOUT = 5
 
-    def initialize(portal, date: nil)
+    def initialize(portal, twitter_handler: nil, date: nil)
       @portal = portal
-      @date = date
+      @date = date || DateTime.now
       @conn = create_request_connection
+      @twitter_handler = twitter_handler
     end
 
     def execute!
       response = make_request
+      locations = @portal.parse_response(response.body)
+
+      @twitter_handler.new(locations).execute! if @twitter_handler
+
+      locations
     end
 
     private
@@ -17,24 +26,29 @@ module Turbovax
     def create_request_connection
       Faraday.new(
         url: @portal.api_base_url,
-        headers: @portal.headers,
-        ssl: { verify: false },
-      ) do |connection|
-        connection.options.timeout = @portal.request_timeout || DEFAULT_REQUEST_TIMEOUT
-      end
+        headers: @portal.request_headers,
+        ssl: { verify: false }
+      )
     end
-  end
 
-  def make_request
-    request_type = @conn.request_type
-    path = @portal.api_path
+    def make_request
+      request_type = @portal.request_http_method
+      path = @portal.api_path
 
-    if request_type == :get
-      @conn.get(path)
-    else
-      @conn.post(path) do |req|
-        req.body = @portal.request_body
+      if request_type == :get
+        # @conn.get(path)
+        @conn.get(path) do |req|
+          req.params = @portal.api_query_params
+        end
+      else
+        @conn.post(path) do |req|
+          req.params = @portal.api_query_params
+          req.body = @portal.request_body(date: @date)
+        end
       end
     end
   end
 end
+
+# reload!; t = Turbovax::TestPortal; DataFetcher.new(t).execute!
+# reload!; e = Turbovax::EasyTestPortal; Turbovax::DataFetcher.new(e).execute!

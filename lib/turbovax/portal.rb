@@ -1,19 +1,28 @@
+require "json"
+
 module Turbovax
   class Portal
-    ATTRIBUTES = %W(key name url api_url url_params
-      request_method request_headers request_cookies request_body request_timeout
-      parse_response
-    )
+    ATTRIBUTES = %w[key name url api_url url_params
+                    request_http_method request_headers request_cookies request_timeout
+                    parse_response]
     # dynamic_api_url_params query_params
-
 
     class << self
       ATTRIBUTES.each do |attribute|
         define_method attribute do |argument = nil, &block|
-          if argument.nil?
-            class_variable_get("@@#{attribute}")
+          variable = nil
+          block_exists =
+            begin
+              variable = class_variable_get("@@#{attribute}")
+              variable.is_a?(Proc)
+            rescue StandardError => e
+              false
+            end
+
+          if !variable.nil?
+            block_exists ? variable.call(argument) : variable
           else
-            class_variable_set("@@#{attribute}", argument)
+            class_variable_set("@@#{attribute}", argument || block)
           end
         end
       end
@@ -26,11 +35,27 @@ module Turbovax
         end
       end
 
+      def request_body(date: nil, &block)
+        if block.nil?
+          @@request_body.call(date)
+        else
+          @@request_body = block
+        end
+      end
+
       def api_dynamic_variables(&block)
         if block.nil?
           @@api_dynamic_variables.call
         else
           @@api_dynamic_variables = block
+        end
+      end
+
+      def parse_response(response = nil, &block)
+        if block.nil?
+          @@parse_response.call(response)
+        else
+          @@parse_response = block
         end
       end
 
@@ -50,21 +75,16 @@ module Turbovax
       # end
 
       def api_base_url
-        api_uri_object.hostname
+        "#{api_uri_object.scheme}://#{api_uri_object.hostname}"
       end
 
       def api_path
-        base_path = []
-        base_path << api_uri_object.path
-        base_path << URI.encode_www_form(api_query_params) if api_query_params != {}
-
-        base_path.join("?")
+        api_uri_object.path
       end
 
       private
 
       def api_uri_object
-        puts api_url
         @@api_uri_object ||= URI(api_url % api_dynamic_variables)
       end
     end
@@ -77,13 +97,12 @@ module Turbovax
       {}
     end
 
-  #   TO_JSON_ATTRIBUTES = %W(key name url)
+    #   TO_JSON_ATTRIBUTES = %W(key name url)
 
-  #   def to_json
-  #     TO_JSON_ATTRIBUTES.each_with_object({}) do |attribute, to_return|
-  #       to_return[attribute] = self.send(attribute)
-  #     end
-  #   end
-
+    #   def to_json
+    #     TO_JSON_ATTRIBUTES.each_with_object({}) do |attribute, to_return|
+    #       to_return[attribute] = self.send(attribute)
+    #     end
+    #   end
   end
 end
