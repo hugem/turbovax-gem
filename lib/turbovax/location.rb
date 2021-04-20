@@ -1,12 +1,9 @@
 module Turbovax
   class Location
-    ATTRIBUTES = %w[id name portal portal_id address area zipcode latitude longitude time_zone vaccine_brands appointments
-                    vaccine_type_data appointments
+    ATTRIBUTES = %w[id name portal portal_id address area zipcode latitude longitude time_zone vaccine_brands
+                    vaccine_type_data
                     data
-                    is_available_data
-                    appointment_data
-                    appointment_count_data
-                    metadata]
+                    metadata].freeze
 
     ATTRIBUTES.each do |attribute|
       attr_accessor attribute
@@ -18,8 +15,8 @@ module Turbovax
       end
     end
 
-    def is_available?
-      data_hash[:is_available] || appointment_count > 0
+    def available
+      data_hash[:is_available] || appointment_count.positive?
     end
 
     def vaccine_types
@@ -29,9 +26,10 @@ module Turbovax
     def appointments
       Array(data_hash[:appointments]).map do |appointment|
         if appointment.is_a?(Turbovax::Appointment)
+          appointment.time_zone = time_zone
           appointment
         else
-          Turbovax::Appointment.new(appointment)
+          Turbovax::Appointment.new(appointment.merge(time_zone: time_zone))
         end
       end
     end
@@ -45,22 +43,5 @@ module Turbovax
     def data_hash
       data || {}
     end
-
-    # def to_h
-    #   ATTRIBUTES.each_with_object({}) do |attribute_name, memo|
-    #     memo[attribute_name] = send(attribute_name)
-    #   end
-    # end
-
-    # def appointment_summary
-    #   appointment_dates = appointments.each do |appointment|
-
-    #   end
-
-    #   {
-    #     dates: [],
-
-    #   }
-    # end
   end
 end

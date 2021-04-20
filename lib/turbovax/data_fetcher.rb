@@ -51,4 +51,4 @@ module Turbovax
 end
 
 # reload!; t = Turbovax::TestPortal; DataFetcher.new(t).execute!
-# reload!; e = Turbovax::EasyTestPortal; Turbovax::DataFetcher.new(e).execute!
+# reload!; e = Turbovax::EasyTestPortal; Turbovax::DataFetcher.new(e, twitter_handler: Turbovax::Twitter::IndividualLocationHandler).execute!
