@@ -7,8 +7,6 @@ module Turbovax
   #  2) passes structured appointment data to twitter handler
   #  3) returns appointment data
   class DataFetcher
-    DEFAULT_REQUEST_TIMEOUT = 5
-
     # @param [Turbovax::Portal]
     # @param [TurboVax::Twitter::Handler] twitter_handler a class handles if appointments are found
     # @param [DateTime] date specific date for request
@@ -22,9 +20,13 @@ module Turbovax
     # @return [Array<Turbovax::Location>] List of locations and appointments
     def execute!
       response = make_request
-      # locations = @portal.parse_response(response.body)
+      log("make request [DONE]")
+
       locations = @portal.parse_response_with_portal(response.body)
+      log("parse response [DONE]")
+
       @twitter_handler&.new(locations)&.execute!
+      log("twitter handler [DONE]")
 
       locations
     end
@@ -37,7 +39,7 @@ module Turbovax
         headers: @portal.request_headers,
         ssl: { verify: false }
       ) do |faraday|
-        faraday.response :logger, nil, { headers: false, bodies: false, log_level: :info }
+        faraday.response :logger, Turbovax.logger, { headers: false, bodies: false, log_level: :info }
         faraday.adapter Faraday.default_adapter
       end
     end
@@ -45,8 +47,6 @@ module Turbovax
     def make_request
       request_type = @portal.request_http_method
       path = @portal.api_path
-
-      log_request(" #{request_type} request #{path}")
 
       if request_type == :get
         @conn.get(path) do |req|
@@ -60,8 +60,8 @@ module Turbovax
       end
     end
 
-    def log_request(message)
-      puts "[#{self.class}] #{message}"
+    def log(message)
+      Turbovax.logger.info("[#{self.class}] #{message}")
     end
   end
 end

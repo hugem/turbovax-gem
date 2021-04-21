@@ -10,8 +10,9 @@ module Turbovax
       #   @example $4
       #     $5
       def self.definte_parameter(
-        attribute, doc_return_type, _explanation = nil, _explanation = nil,
-         _example = nil)
+        attribute, _doc_return_type, _explanation = nil, _explanation = nil,
+        _example = nil
+      )
         # metaprogramming magic so that
         #   1) attributes can be defined via DSL
         #   2) attributes can be fetched when method is called without any parameters
@@ -37,17 +38,18 @@ module Turbovax
       definte_parameter :name, String, "Full name of portal", "Name", "'New York City Vaccine Website'"
       definte_parameter :key, String, "Unique identifier for portal", "Key", "'nyc_vax'"
       definte_parameter :url,
-        String, "Link to public facing website", "Full URL", "'https://www.turbovax.info/'"
+                        String, "Link to public facing website", "Full URL", "'https://www.turbovax.info/'"
 
-      definte_parameter :request_headers, Hash, "Key:value mapping of HTTP request headers", "Specify user agent and cookies", "{ 'user-agent': 'Mozilla/5.0', 'cookies': 'ABC' }"
+      definte_parameter :request_headers, Hash, "Key:value mapping of HTTP request headers",
+                        "Specify user agent and cookies", "{ 'user-agent': 'Mozilla/5.0', 'cookies': 'ABC' }"
       definte_parameter :request_http_method, Symbol, ":get or :post"
       definte_parameter :api_url, String, "API endpoint", "'https://api.turbovax.info/v1/dashboard'"
       definte_parameter :api_query_params, Hash,
-        "Key:value mapping that will be encoded + appended to URL when making the request",
-        "{ page: 1 }"
+                        "Key:value mapping that will be encoded + appended to URL when making the request",
+                        "{ page: 1 }"
       definte_parameter :api_dynamic_variables, Hash,
-        "Hash or block that is interpolated ",
-        '
+                        "Hash or block that is interpolated ",
+                        '
           api_dynamic_variables do |data_fetcher_params|
             {
               site_id: NAME_TO_ID_MAPPING[data_fetcher_params[:name]],
@@ -62,8 +64,8 @@ module Turbovax
           api_url "https://api.turbovax.info/v1/sites/8888/2021-08-08"
         '
       definte_parameter :request_body, Hash,
-        "Hash (or block evaluates to a hash) that is used to in a POST request",
-        '
+                        "Hash (or block evaluates to a hash) that is used to in a POST request",
+                        '
           request_body do |data_fetcher_params|
             {
               site_id: NAME_TO_ID_MAPPING[data_fetcher_params[:name]],

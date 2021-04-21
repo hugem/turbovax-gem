@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "logger"
+
 require_relative "turbovax/version"
 require_relative "turbovax/portal"
 require_relative "turbovax/location"
@@ -11,9 +13,10 @@ require_relative "turbovax/twitter/client"
 require_relative "turbovax/twitter/individual_location_handler"
 
 module Turbovax
-  class Error < StandardError; end
-  # Your code goes here...
-
-  def self.test; end
+  # TODO: (configure logger)
+  def self.logger
+    @logger ||= Logger.new(STDOUT)
+    @logger.level = Logger::INFO
+    @logger
+  end
 end
-
