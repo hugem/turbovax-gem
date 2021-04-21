@@ -15,7 +15,7 @@ require_relative "turbovax/twitter/individual_location_handler"
 module Turbovax
   # TODO: (configure logger)
   def self.logger
-    @logger ||= Logger.new(STDOUT)
+    @logger ||= Logger.new($stdout)
     @logger.level = Logger::INFO
     @logger
   end

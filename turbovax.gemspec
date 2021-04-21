@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["huge.ma@gmail.com"]
 
   spec.summary       = "TurboVax!"
-  spec.description   = "Turbovax!"
+  spec.description   = spec.summary
   spec.homepage      = "https://www.turbovax.info/"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.4.0")
 
@@ -28,7 +28,6 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  # Uncomment to register a new dependency of your gem
   spec.add_dependency "activesupport", "~> 6.0", ">= 6.0.0.1"
   spec.add_dependency "faraday", "~> 0.17"
   spec.add_dependency "twitter", "~> 7.0"

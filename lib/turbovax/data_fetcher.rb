@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "date"
 require "faraday"
 
@@ -39,7 +41,8 @@ module Turbovax
         headers: @portal.request_headers,
         ssl: { verify: false }
       ) do |faraday|
-        faraday.response :logger, Turbovax.logger, { headers: false, bodies: false, log_level: :info }
+        faraday.response :logger, Turbovax.logger,
+                         { headers: false, bodies: false, log_level: :info }
         faraday.adapter Faraday.default_adapter
       end
     end
@@ -50,7 +53,11 @@ module Turbovax
 
       if request_type == :get
         @conn.get(path) do |req|
-          req.params = @portal.api_query_params
+          # only set params if they are present, otherwise this will overwrite any string query
+          # param values that are existing in the url path
+          if @portal.api_query_params.nil? || @portal.api_query_params != {}
+            req.params = @portal.api_query_params
+          end
         end
       else
         @conn.post(path) do |req|

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "twitter"
 
 # Sends tweet for each
