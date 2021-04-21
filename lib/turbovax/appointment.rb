@@ -1,13 +1,18 @@
 require "active_support/all"
 
 module Turbovax
+  # Class that encapsulates a singular appointment
   class Appointment
-    ATTRIBUTES = %w[time time_zone is_second_dose vaccine_type]
+    # @return [DateTime]
+    attr_accessor :time
+    # @return [String]
+    attr_accessor :time_zone
+    # @return [Boolean]
+    attr_accessor :is_second_dose
+    # @return [String]
+    attr_accessor :vaccine_type
 
-    ATTRIBUTES.each do |attribute|
-      attr_accessor attribute
-    end
-
+    # @param params hash mapping of attribute => value
     def initialize(**params)
       params.each do |attribute, value|
         value_to_save =
@@ -21,9 +26,13 @@ module Turbovax
       end
     end
 
+    # If time_zone is set on instance, returns appointment time in time zone
+    # @return [DateTime]
     def time_in_time_zone
       time_zone ? time.in_time_zone(time_zone) : time
     end
+
+    private
 
     def <=>(other)
       time <=> other.time
