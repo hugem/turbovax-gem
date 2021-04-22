@@ -3,6 +3,7 @@
 require "json"
 
 module Turbovax
+  # Captures configuration required to fetch and process data from a specific vaccine website
   class Portal
     class << self
       # @!macro [attach] definte_parameter
@@ -42,12 +43,16 @@ module Turbovax
                         "'New York City Vaccine Website'"
       definte_parameter :key, String, "Unique identifier for portal", "Key", "'nyc_vax'"
       definte_parameter :url,
-                        String, "Link to public facing website", "Full URL", "'https://www.turbovax.info/'"
+                        String,
+                        "Link to public facing website", "Full URL",
+                        "'https://www.turbovax.info/'"
 
       definte_parameter :request_headers, Hash, "Key:value mapping of HTTP request headers",
-                        "Specify user agent and cookies", "{ 'user-agent': 'Mozilla/5.0', 'cookies': 'ABC' }"
+                        "Specify user agent and cookies", "{ 'user-agent': 'Mozilla/5.0', " \
+                        "'cookies': 'ABC' }"
       definte_parameter :request_http_method, Symbol,
-                        "Turbovax::Constants::GET_REQUEST_METHOD or Turbovax::Constants::POST_REQUEST_METHOD"
+                        "Turbovax::Constants::GET_REQUEST_METHOD or " \
+                        "Turbovax::Constants::POST_REQUEST_METHOD"
       definte_parameter :api_url, String, "Full API URL", "Example Turbovax endpoint",
                         "'https://api.turbovax.info/v1/dashboard'"
       definte_parameter :api_url_variables, Hash,
@@ -61,7 +66,7 @@ module Turbovax
           end
 
           #  before api_url_variables interpolation
-          api_url "https://api.turbovax.info/v1/sites/%{site_id}/${date}"
+          api_url "https://api.turbovax.info/v1/sites/%{site_id}/%{date}"
 
           #  after api_url_variables interpolation
           api_url "https://api.turbovax.info/v1/sites/8888/2021-08-08"

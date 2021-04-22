@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Turbovax
+  # Representation of an individual vaccination site
   class Location
     # @return [String]
     # Unique ID for identification purposes

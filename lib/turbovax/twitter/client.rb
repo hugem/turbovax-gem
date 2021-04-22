@@ -4,13 +4,14 @@ require "twitter"
 
 module Turbovax
   module Twitter
+    # Helper class that wraps around Twitter gem
     class Client
       def self.client
         @client ||= Twitter::REST::Client.new do |config|
-          config.consumer_key        = ENV["TWITTER_API_KEY"]
-          config.consumer_secret     = ENV["TWITTER_API_SECRET"]
-          config.access_token        = ENV["TWITTER_ACCESS_TOKEN"]
-          config.access_token_secret = ENV["TWITTER_ACCESS_TOKEN_SECRET"]
+          config.consumer_key        = Turbovax.twitter_credentials[:consumer_key]
+          config.consumer_secret     = Turbovax.twitter_credentials[:consumer_secret]
+          config.access_token        = Turbovax.twitter_credentials[:access_token]
+          config.access_token_secret = Turbovax.twitter_credentials[:access_token_secret]
         end
       end
 

@@ -11,7 +11,7 @@ module Turbovax
   class DataFetcher
     # @param [Turbovax::Portal] portal
     # @param [TurboVax::Twitter::Handler] twitter_handler a class handles if appointments are found
-    # @param [Hash] extra_params other info that you want to supply to the portal when executing blocks
+    # @param [Hash] extra_params other info that can be provided to portal when executing blocks
     def initialize(portal, twitter_handler: nil, extra_params: {})
       @portal = portal
       @extra_params = { date: DateTime.now }.merge(extra_params)
@@ -23,21 +23,26 @@ module Turbovax
     def execute!
       response = make_request
       log("make request [DONE]")
-
       locations = @portal.parse_response_with_portal(response.body, @extra_params)
       log("parse response [DONE]")
 
-      if Turbovax.twitter_enabled
-        @twitter_handler&.new(locations)&.execute!
-        log("twitter handler [DONE]")
-      else
-        log("twitter handler [SKIPPED]")
-      end
+      send_to_twitter_handler(locations)
 
       locations
     end
 
     private
+
+    def send_to_twitter_handler(locations)
+      if !locations.size.positive?
+        log("twitter handler [SKIP]: no location data")
+      elsif Turbovax.twitter_enabled
+        @twitter_handler&.new(locations)&.execute!
+        log("twitter handler [DONE]")
+      else
+        log("twitter handler [SKIP] not enabled")
+      end
+    end
 
     def create_request_connection
       Faraday.new(
@@ -54,26 +59,32 @@ module Turbovax
     def make_request
       request_type = @portal.request_http_method
       path = @portal.api_path
-      # query_params = {}
       query_params = @portal.api_query_params(@extra_params)
 
       case request_type
       when Turbovax::Constants::GET_REQUEST_METHOD
-        @conn.get(path) do |req|
-          # only set params if they are present, otherwise this will overwrite any string query
-          # param values that are existing in the url path
-          req.params = query_params if query_params.nil? || query_params != {}
-        end
+        make_get_request(path, query_params)
       when Turbovax::Constants::POST_REQUEST_METHOD
-        @conn.post(path) do |req|
-          # only set params if they are present, otherwise this will overwrite any string query
-          # param values that are existing in the url path
-          req.params = query_params if query_params.nil? || query_params != {}
-
-          req.body = @portal.request_body(@extra_params)
-        end
+        make_post_request(path, query_params)
       else
         raise Turbovax::InvalidRequestTypeError
+      end
+    end
+
+    def make_get_request(path, query_params)
+      @conn.get(path) do |req|
+        # only set params if they are present, otherwise this will overwrite any string query
+        # param values that are existing in the url path
+        req.params = query_params if query_params.nil? || query_params != {}
+      end
+    end
+
+    def make_post_request(path, query_params)
+      @conn.post(path) do |req|
+        # only set params if they are present, otherwise this will overwrite any string query
+        # param values that are existing in the url path
+        req.params = query_params if query_params.nil? || query_params != {}
+        req.body = @portal.request_body(@extra_params)
       end
     end
 

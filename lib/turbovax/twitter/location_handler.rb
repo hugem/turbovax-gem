@@ -2,9 +2,9 @@
 
 require "twitter"
 
-# Sends tweet for each
 module Turbovax
   module Twitter
+    # Given a list of locations, tweet appointment info
     class LocationHandler
       def initialize(locations)
         @locations = locations

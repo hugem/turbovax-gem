@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary       = "TurboVax!"
   spec.description   = spec.summary
   spec.homepage      = "https://www.turbovax.info/"
-  spec.required_ruby_version = Gem::Requirement.new(">= 2.4.0")
+  spec.required_ruby_version = Gem::Requirement.new(">= 2.5.0")
 
   spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
 
