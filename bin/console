@@ -13,12 +13,9 @@ def reload!
 end
 
 def reload_paths(require_regex)
-  $".grep(/#{require_regex}/).each {|e| $".delete(e) && require(e) }
+  $LOADED_FEATURES.grep(/#{require_regex}/).each { |e| $LOADED_FEATURES.delete(e) && require(e) }
 end
 
 # (If you use this, don't forget to add pry to your Gemfile!)
 require "pry"
 Pry.start
-
-# require "irb"
-# IRB.start(__FILE__)

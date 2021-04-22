@@ -2,6 +2,7 @@
 
 require "logger"
 
+require_relative "turbovax/constants"
 require_relative "turbovax/version"
 require_relative "turbovax/portal"
 require_relative "turbovax/location"
@@ -13,9 +14,6 @@ require_relative "turbovax/twitter/client"
 require_relative "turbovax/twitter/location_handler"
 
 module Turbovax
-  GET_REQUEST_METHOD = :get
-  POST_REQUEST_METHOD = :post
-
   class InvalidRequestTypeError < StandardError; end
 
   def self.configure

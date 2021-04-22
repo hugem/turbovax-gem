@@ -9,12 +9,12 @@ module Turbovax
   #  2) passes structured appointment data to twitter handler
   #  3) returns appointment data
   class DataFetcher
-    # @param [Turbovax::Portal]
+    # @param [Turbovax::Portal] portal
     # @param [TurboVax::Twitter::Handler] twitter_handler a class handles if appointments are found
-    # @param [DateTime] date specific date for request
-    def initialize(portal, twitter_handler: nil, date: nil)
+    # @param [Hash] extra_params other info that you want to supply to the portal when executing blocks
+    def initialize(portal, twitter_handler: nil, extra_params: {})
       @portal = portal
-      @date = date || DateTime.now
+      @extra_params = { date: DateTime.now }.merge(extra_params)
       @conn = create_request_connection
       @twitter_handler = twitter_handler
     end
@@ -24,7 +24,7 @@ module Turbovax
       response = make_request
       log("make request [DONE]")
 
-      locations = @portal.parse_response_with_portal(response.body)
+      locations = @portal.parse_response_with_portal(response.body, @extra_params)
       log("parse response [DONE]")
 
       if Turbovax.twitter_enabled
@@ -54,23 +54,26 @@ module Turbovax
     def make_request
       request_type = @portal.request_http_method
       path = @portal.api_path
+      # query_params = {}
+      query_params = @portal.api_query_params(@extra_params)
 
       case request_type
-      when Turbovax::GET_REQUEST_METHOD
+      when Turbovax::Constants::GET_REQUEST_METHOD
         @conn.get(path) do |req|
           # only set params if they are present, otherwise this will overwrite any string query
           # param values that are existing in the url path
-          if @portal.api_query_params.nil? || @portal.api_query_params != {}
-            req.params = @portal.api_query_params
-          end
+          req.params = query_params if query_params.nil? || query_params != {}
         end
-      when Turbovax::POST_REQUEST_METHOD
+      when Turbovax::Constants::POST_REQUEST_METHOD
         @conn.post(path) do |req|
-          req.params = @portal.api_query_params
-          req.body = @portal.request_body(date: @date)
+          # only set params if they are present, otherwise this will overwrite any string query
+          # param values that are existing in the url path
+          req.params = query_params if query_params.nil? || query_params != {}
+
+          req.body = @portal.request_body(@extra_params)
         end
       else
-        raise InvalidRequestTypeError
+        raise Turbovax::InvalidRequestTypeError
       end
     end
 

@@ -47,41 +47,39 @@ module Turbovax
       definte_parameter :request_headers, Hash, "Key:value mapping of HTTP request headers",
                         "Specify user agent and cookies", "{ 'user-agent': 'Mozilla/5.0', 'cookies': 'ABC' }"
       definte_parameter :request_http_method, Symbol,
-        "Turbovax::GET_REQUEST_METHOD or Turbovax::POST_REQUEST_METHOD"
-      definte_parameter :api_url, String, "API endpoint", "'https://api.turbovax.info/v1/dashboard'"
-      definte_parameter :api_query_params, Hash,
-                        "Key:value mapping that will be encoded + appended to URL when making the request",
-                        "{ page: 1 }"
-      definte_parameter :api_dynamic_variables, Hash,
+                        "Turbovax::Constants::GET_REQUEST_METHOD or Turbovax::Constants::POST_REQUEST_METHOD"
+      definte_parameter :api_url, String, "Full API URL", "Example Turbovax endpoint",
+                        "'https://api.turbovax.info/v1/dashboard'"
+      definte_parameter :api_url_variables, Hash,
                         "Hash or block that is interpolated ",
                         '
-          api_dynamic_variables do |data_fetcher_params|
+          api_url_variables do |extra_params|
             {
-              site_id: NAME_TO_ID_MAPPING[data_fetcher_params[:name]],
-              date: data_fetcher_params.strftime("%F"),
+              site_id: NAME_TO_ID_MAPPING[extra_params[:name]],
+              date: extra_params.strftime("%F"),
             }
           end
 
-          #  before api_dynamic_variables interpolation
+          #  before api_url_variables interpolation
           api_url "https://api.turbovax.info/v1/sites/%{site_id}/${date}"
 
-          #  after api_dynamic_variables interpolation
+          #  after api_url_variables interpolation
           api_url "https://api.turbovax.info/v1/sites/8888/2021-08-08"
         '
-      definte_parameter :request_body, Hash,
-                        "Hash (or block evaluates to a hash) that is used to in a POST request",
-                        '
-          request_body do |data_fetcher_params|
-            {
-              site_id: NAME_TO_ID_MAPPING[data_fetcher_params[:name]],
-              date: data_fetcher_params.strftime("%F"),
-            }
-          end
-        '
+      # definte_parameter :request_body, Hash,
+      #                   "Hash (or block evaluates to a hash) that is used to in a POST request",
+      #                   '
+      #     request_body do |extra_params|
+      #       {
+      #         site_id: NAME_TO_ID_MAPPING[extra_params[:name]],
+      #         date: extra_params.strftime("%F"),
+      #       }
+      #     end
+      #   '
 
       # Block that will called after raw data is fetched from API. Must return list of Location
       # instances
-      # @param [String] response string passed to the block when it is called
+      # @param [Array] args passed from [Turbovax::DataFetcher]
       # @param [Block] block stored as a class instance variable
       # @return [Array<Turbovax::Location>]
       # @example Parse API responses from turbovax.info
@@ -101,11 +99,48 @@ module Turbovax
       #         )
       #       end
       #     end
-      def parse_response(response = nil, &block)
-        if block.nil?
-          @parse_response.call(response)
-        else
+      def parse_response(*args, &block)
+        if args.size.positive? && !@parse_response.nil?
+          @parse_response.call(*args)
+        elsif !block.nil?
           @parse_response = block
+        else
+          {}
+        end
+      end
+
+      # Block that will be executed and then appended to API url path. The extra_params variable is
+      # provided by Turbovax::DataFetcher.
+      # When specified, this will overwrite any query string that is already present in api_url
+      #
+      # @param [Array] args passed from [Turbovax::DataFetcher]
+      # @param [Block] block stored as a class instance variable
+      # @return [Hash]
+      # @example Append date and noCache to URL
+      #   # result: /path?date=2021-08-08&noCache=0.123
+      #   api_query_params do |extra_params|
+      #     {
+      #       date: extra_params[:date].strftime("%F"),
+      #       noCache: rand,
+      #     }
+      #   end
+      def api_query_params(*args, &block)
+        if args.size.positive? && !@api_query_params.nil?
+          @api_query_params.call(*args)
+        elsif !block.nil?
+          @api_query_params = block
+        else
+          {}
+        end
+      end
+
+      def request_body(*args, &block)
+        if args.size.positive? && !@request_body.nil?
+          @request_body.call(*args)
+        elsif !block.nil?
+          @request_body = block
+        else
+          {}.to_json
         end
       end
 
@@ -121,8 +156,8 @@ module Turbovax
 
       # Calls parse_response and assigns portal to each location so user doesn't need to do
       # this by themselves
-      def parse_response_with_portal(response)
-        parse_response(response).map do |location|
+      def parse_response_with_portal(response, extra_params)
+        parse_response(response, extra_params).map do |location|
           location.portal ||= self
           location
         end
@@ -131,18 +166,8 @@ module Turbovax
       private
 
       def api_uri_object
-        @api_uri_object ||= URI(api_url % api_dynamic_variables)
+        @api_uri_object ||= URI(api_url % api_url_variables)
       end
-    end
-
-    # set default values
-    api_query_params do
-      {}
-    end
-
-    # set default values
-    api_dynamic_variables do
-      {}
     end
   end
 end
