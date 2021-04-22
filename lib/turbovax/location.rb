@@ -11,7 +11,7 @@ module Turbovax
     # @return [Turbovax::Portal]
     attr_accessor :portal
     # @return [String]
-    # ID that was specified by the portal
+    # Portal specific ID
     attr_accessor :portal_id
     # @return [String]
     attr_accessor :area
@@ -24,12 +24,13 @@ module Turbovax
     # @return [String]
     attr_accessor :longitude
     # @return [String]
+    # Valid values in https://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html
     attr_accessor :time_zone
     # @return [Hash]
-    # Use to specify appointments, appointment_count, available, vaccine_types
+    # Use this nested hash to specify appointments, appointment_count, available, vaccine_types
     attr_accessor :data
     # @return [Hash]
-    # Use to add any metadata
+    # Use this attribute to add any metadata
     attr_accessor :metadata
 
     def initialize(**params)
@@ -38,14 +39,19 @@ module Turbovax
       end
     end
 
+    # @return [Boolean]
+    # This can be manually specified via data hash or automatically calculated if
+    # appointment_count > 0
     def available
-      data_hash[:is_available] || appointment_count.positive?
+      data_hash[:available] || appointment_count.positive?
     end
 
+    # This can be manually specified via data hash or automatically calculated
     def vaccine_types
       data_hash[:vaccine_types] || appointments.map(&:vaccine_type).uniq
     end
 
+    # Returns a list of appointment instances (which are defined via) data hash
     def appointments
       Array(data_hash[:appointments]).map do |appointment|
         if appointment.is_a?(Turbovax::Appointment)

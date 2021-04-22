@@ -5,7 +5,7 @@ require "twitter"
 # Sends tweet for each
 module Turbovax
   module Twitter
-    class IndividualLocationHandler
+    class LocationHandler
       def initialize(locations)
         @locations = locations
       end

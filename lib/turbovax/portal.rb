@@ -19,6 +19,7 @@ module Turbovax
         #   1) attributes can be defined via DSL
         #   2) attributes can be fetched when method is called without any parameters
         #   3) attributes can saved static variables or blocks that can be called (for dynamic)
+        # might be better to refactor in the future
         define_method attribute do |argument = nil, &block|
           variable = nil
           block_exists =
@@ -45,7 +46,8 @@ module Turbovax
 
       definte_parameter :request_headers, Hash, "Key:value mapping of HTTP request headers",
                         "Specify user agent and cookies", "{ 'user-agent': 'Mozilla/5.0', 'cookies': 'ABC' }"
-      definte_parameter :request_http_method, Symbol, ":get or :post"
+      definte_parameter :request_http_method, Symbol,
+        "Turbovax::GET_REQUEST_METHOD or Turbovax::POST_REQUEST_METHOD"
       definte_parameter :api_url, String, "API endpoint", "'https://api.turbovax.info/v1/dashboard'"
       definte_parameter :api_query_params, Hash,
                         "Key:value mapping that will be encoded + appended to URL when making the request",

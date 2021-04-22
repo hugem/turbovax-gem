@@ -27,8 +27,12 @@ module Turbovax
       locations = @portal.parse_response_with_portal(response.body)
       log("parse response [DONE]")
 
-      @twitter_handler&.new(locations)&.execute!
-      log("twitter handler [DONE]")
+      if Turbovax.twitter_enabled
+        @twitter_handler&.new(locations)&.execute!
+        log("twitter handler [DONE]")
+      else
+        log("twitter handler [SKIPPED]")
+      end
 
       locations
     end
@@ -42,7 +46,7 @@ module Turbovax
         ssl: { verify: false }
       ) do |faraday|
         faraday.response :logger, Turbovax.logger,
-                         { headers: false, bodies: false, log_level: :info }
+                         Turbovax.faraday_logging_config
         faraday.adapter Faraday.default_adapter
       end
     end
@@ -51,7 +55,8 @@ module Turbovax
       request_type = @portal.request_http_method
       path = @portal.api_path
 
-      if request_type == :get
+      case request_type
+      when Turbovax::GET_REQUEST_METHOD
         @conn.get(path) do |req|
           # only set params if they are present, otherwise this will overwrite any string query
           # param values that are existing in the url path
@@ -59,11 +64,13 @@ module Turbovax
             req.params = @portal.api_query_params
           end
         end
-      else
+      when Turbovax::POST_REQUEST_METHOD
         @conn.post(path) do |req|
           req.params = @portal.api_query_params
           req.body = @portal.request_body(date: @date)
         end
+      else
+        raise InvalidRequestTypeError
       end
     end
 

@@ -10,13 +10,56 @@ require_relative "turbovax/easy_test_portal"
 require_relative "turbovax/data_fetcher"
 
 require_relative "turbovax/twitter/client"
-require_relative "turbovax/twitter/individual_location_handler"
+require_relative "turbovax/twitter/location_handler"
 
 module Turbovax
-  # TODO: (configure logger)
+  GET_REQUEST_METHOD = :get
+  POST_REQUEST_METHOD = :post
+
+  class InvalidRequestTypeError < StandardError; end
+
+  def self.configure
+    yield self
+  end
+
   def self.logger
-    @logger ||= Logger.new($stdout)
-    @logger.level = Logger::INFO
-    @logger
+    @logger ||= Logger.new($stdout, level: Logger::INFO)
+  end
+
+  def self.logger=(logger)
+    if logger.nil?
+      self.logger.level = Logger::FATAL
+      return self.logger
+    end
+
+    @logger = logger
+  end
+
+  def self.twitter_enabled
+    # enable twitter by default
+    @twitter_enabled = true if @twitter_enabled.nil?
+    @twitter_enabled
+  end
+
+  def self.twitter_enabled=(twitter_enabled)
+    @twitter_enabled = twitter_enabled
+  end
+
+  def self.twitter_credentials
+    raise NotImplementedError, "no twitter credentials provided" if @twitter_credentials.nil?
+
+    @twitter_credentials
+  end
+
+  def self.twitter_credentials=(twitter_credentials)
+    @twitter_credentials = twitter_credentials
+  end
+
+  def self.faraday_logging_config
+    @faraday_logging_config ||= { headers: false, bodies: false, log_level: :info }
+  end
+
+  def self.faraday_logging_config=(faraday_logging_config)
+    @faraday_logging_config = faraday_logging_config
   end
 end
