@@ -5,19 +5,18 @@ require_relative "lib/turbovax/version"
 Gem::Specification.new do |spec|
   spec.name          = "turbovax"
   spec.version       = Turbovax::VERSION
-  spec.authors       = ["hugem"]
-  spec.email         = ["huge.ma@gmail.com"]
+  spec.authors       = ["Huge Ma"]
+  spec.email         = ["huge@turbovax.info"]
+  spec.license        = "AGPLv3"
 
-  spec.summary       = "TurboVax!"
+  spec.summary       = "Quickly build vaccine twitter bots"
   spec.description   = spec.summary
-  spec.homepage      = "https://www.turbovax.info/"
+  spec.homepage      = "https://github.com/hugem/turbovax-gem"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.5.0")
 
-  spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
-
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://www.turbovax.info/"
-  spec.metadata["changelog_uri"] = "https://www.turbovax.info/"
+  spec.metadata["source_code_uri"] = "https://github.com/hugem/turbovax-gem"
+  spec.metadata["changelog_uri"] = "https://github.com/hugem/turbovax-gem/CHANGELOG.md"
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
