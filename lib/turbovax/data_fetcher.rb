@@ -34,13 +34,13 @@ module Turbovax
     private
 
     def send_to_twitter_handler(locations)
-      if !locations.size.positive?
+      if !Turbovax.twitter_enabled
+        log("twitter handler [SKIP] not enabled")
+      elsif !locations.size.positive?
         log("twitter handler [SKIP]: no location data")
-      elsif Turbovax.twitter_enabled
+      else
         @twitter_handler&.new(locations)&.execute!
         log("twitter handler [DONE]")
-      else
-        log("twitter handler [SKIP] not enabled")
       end
     end
 

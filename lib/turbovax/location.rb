@@ -4,7 +4,7 @@ module Turbovax
   # Representation of an individual vaccination site
   class Location
     # @return [String]
-    # Unique ID for identification purposes
+    # Turbovax-specific unique ID for identification purposes
     attr_accessor :id
     # @return [String]
     # Human readable name
@@ -15,9 +15,9 @@ module Turbovax
     # Portal specific ID
     attr_accessor :portal_id
     # @return [String]
-    attr_accessor :area
+    attr_accessor :full_address
     # @return [String]
-    attr_accessor :street
+    attr_accessor :area
     # @return [String]
     attr_accessor :zipcode
     # @return [String]

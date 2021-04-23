@@ -3,7 +3,7 @@
 require "twitter"
 
 module Turbovax
-  module Twitter
+  module Handlers
     # Given a list of locations, tweet appointment info
     class LocationHandler
       def initialize(locations)
@@ -11,9 +11,17 @@ module Turbovax
       end
 
       def execute!
-        @locations.first(daily_appointment_limit).each do |location|
-          handle_location(location)
+        count = 0
+        @locations.each do |location|
+          next if count >= max_location_limit
+
+          count += 1 if handle_location(location)
         end
+      end
+
+      # Max locations to tweet at a given time
+      def max_location_limit
+        2
       end
 
       # Max number of days included in a tweet
@@ -38,27 +46,25 @@ module Turbovax
         "%-l:%M%p"
       end
 
+      # @return [Boolean]
       # override to add caching logic
-      def should_tweet_for_location(_location)
-        false
+      def should_tweet_for_location(location)
+        location.available
       end
 
       private
 
       def handle_location(location)
-        unless should_tweet_for_location(location)
-          # LOG something
-        end
+        return false unless should_tweet_for_location(location)
 
         text = format_tweet(location)
 
-        puts text
-
-        # send_tweet(text)
+        send_tweet(text)
+        true
       end
 
       def send_tweet(text)
-        Turbovax::Twitter::Client.send_tweet(text)
+        Turbovax::TwitterClient.send_tweet(text)
       end
 
       def format_tweet(location)
@@ -72,7 +78,7 @@ module Turbovax
         to_join << summary_string
 
         to_join << format_appointments(location)
-        to_join << portal.url
+        to_join << portal.public_url
 
         to_join.join("\n\n")
       end

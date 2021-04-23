@@ -8,6 +8,7 @@ module Turbovax
     # @return [DateTime]
     attr_accessor :time
     # @return [String]
+    # Can automatically be set by Turbovax::Location instance
     attr_accessor :time_zone
     # @return [Boolean]
     attr_accessor :is_second_dose
@@ -19,7 +20,11 @@ module Turbovax
       params.each do |attribute, value|
         value_to_save =
           if attribute.to_s == "time"
-            DateTime.parse(value)
+            if value.is_a?(DateTime) || value.is_a?(Time)
+              value
+            else
+              DateTime.parse(value)
+            end
           else
             value
           end

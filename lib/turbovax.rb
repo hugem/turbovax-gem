@@ -9,8 +9,8 @@ require_relative "turbovax/location"
 require_relative "turbovax/appointment"
 require_relative "turbovax/data_fetcher"
 
-require_relative "turbovax/twitter/client"
-require_relative "turbovax/twitter/location_handler"
+require_relative "turbovax/twitter_client"
+require_relative "turbovax/handlers/location_handler"
 
 # Turbovax gem
 module Turbovax

@@ -42,7 +42,7 @@ module Turbovax
       definte_parameter :name, String, "Full name of portal", "Name",
                         "'New York City Vaccine Website'"
       definte_parameter :key, String, "Unique identifier for portal", "Key", "'nyc_vax'"
-      definte_parameter :url,
+      definte_parameter :public_url,
                         String,
                         "Link to public facing website", "Full URL",
                         "'https://www.turbovax.info/'"

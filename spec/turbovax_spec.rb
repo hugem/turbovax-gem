@@ -5,7 +5,7 @@ RSpec.describe Turbovax do
     expect(Turbovax::VERSION).not_to be nil
   end
 
-  it "does something useful" do
+  it "does not error" do
     expect(false).to eq(true)
   end
 end
