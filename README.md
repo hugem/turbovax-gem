@@ -1,8 +1,11 @@
 # Turbovax
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/turbovax`. To experiment with that code, run `bin/console` for an interactive prompt.
+Turbovax gem helps you quickly stand up bots that can:
+1) fetch data from vaccine websites
+2) tweet appointment data
+3) return structured appointment data
 
-TODO: Delete this and the text above, and describe your gem
+It does not provide any data storage or web server layers. You can build that functionality on top of the gem by yourself.
 
 ## Installation
 
@@ -22,7 +25,61 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Initialize configuration (optional):
+```ruby
+Turbovax.configure do |config|
+  config.logger = Logger.new($stdout, level: Logger::DEBUG)
+  config.twitter_enabled = true
+  config.twitter_credentials = {
+    consumer_key: "CONSUMER_KEY",
+    consumer_secret: "CONSUMER_SECRET",
+    access_token: "ACCESS_TOKEN",
+    access_token_secret: "ACCESS_TOKEN_SECRET"
+  }
+
+  config.faraday_logging_config = {
+    headers: true,
+    bodies: true,
+    log_level: :info
+  }
+end
+```
+Create test portal:
+```ruby
+class TestPortal < Turbovax::Portal
+  name "Gotham City Clinic"
+  key "gotham_city"
+  public_url "https://www.turbovax.info/"
+  api_url "http://api.turbovax.info/v1/test.json"
+  request_http_method Turbovax::Constants::GET_REQUEST_METHOD
+
+  parse_response do |response|
+    response_json = JSON.parse(response)
+    Array(response_json["appointments"]).map do |location_json|
+      appointments = Array(location_json["slots"]).map do |appointment_string|
+        {
+          time: DateTime.parse(appointment_string)
+        }
+      end
+
+      Turbovax::Location.new(
+        id: "ID",
+        name: location_json["clinic_name"],
+        full_address: location_json["area"],
+        time_zone: "America/New_York",
+        data: {
+          vaccine_types: [location_json["vaccine"]],
+          appointments: appointments,
+        }
+      )
+    end
+  end
+end
+```
+Execute operation:
+```
+locations = Turbovax::DataFetcher.new(TestPortal, twitter_handler: Turbovax::Handlers::LocationHandler).execute!
+```
 
 ## Development
 
@@ -32,8 +89,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/turbovax. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/turbovax/blob/master/CODE_OF_CONDUCT.md).
-
-## Code of Conduct
-
-Everyone interacting in the Turbovax project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/turbovax/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/hugem/turbovax-gem. 
