@@ -17,3 +17,7 @@ MethodLength:
 
 Style/FormatStringToken:
   Enabled: false
+
+Style/TrailingCommaInHashLiteral:
+  Enabled: true
+  EnforcedStyle: consistent_comma
