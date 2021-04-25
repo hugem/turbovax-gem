@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.version       = Turbovax::VERSION
   spec.authors       = ["Huge Ma"]
   spec.email         = ["huge@turbovax.info"]
-  spec.license        = "AGPLv3"
+  spec.license       = "AGPLv3"
 
   spec.summary       = "Quickly build vaccine twitter bots"
   spec.description   = spec.summary

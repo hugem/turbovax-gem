@@ -26,60 +26,59 @@ Or install it yourself as:
 ## Usage
 
 Initialize configuration (optional):
-```ruby
-Turbovax.configure do |config|
-  config.logger = Logger.new($stdout, level: Logger::DEBUG)
-  config.twitter_enabled = true
-  config.twitter_credentials = {
-    consumer_key: "CONSUMER_KEY",
-    consumer_secret: "CONSUMER_SECRET",
-    access_token: "ACCESS_TOKEN",
-    access_token_secret: "ACCESS_TOKEN_SECRET"
-  }
 
-  config.faraday_logging_config = {
-    headers: true,
-    bodies: true,
-    log_level: :info
-  }
-end
-```
-Create test portal:
-```ruby
-class TestPortal < Turbovax::Portal
-  name "Gotham City Clinic"
-  key "gotham_city"
-  public_url "https://www.turbovax.info/"
-  api_url "http://api.turbovax.info/v1/test.json"
-  request_http_method Turbovax::Constants::GET_REQUEST_METHOD
+    Turbovax.configure do |config|
+      config.logger = Logger.new($stdout, level: Logger::DEBUG)
+      config.twitter_enabled = true
+      config.twitter_credentials = {
+        consumer_key: "CONSUMER_KEY",
+        consumer_secret: "CONSUMER_SECRET",
+        access_token: "ACCESS_TOKEN",
+        access_token_secret: "ACCESS_TOKEN_SECRET"
+      }
 
-  parse_response do |response|
-    response_json = JSON.parse(response)
-    Array(response_json["appointments"]).map do |location_json|
-      appointments = Array(location_json["slots"]).map do |appointment_string|
-        {
-          time: DateTime.parse(appointment_string)
-        }
-      end
-
-      Turbovax::Location.new(
-        id: "ID",
-        name: location_json["clinic_name"],
-        full_address: location_json["area"],
-        time_zone: "America/New_York",
-        data: {
-          vaccine_types: [location_json["vaccine"]],
-          appointments: appointments,
-        }
-      )
+      config.faraday_logging_config = {
+        headers: true,
+        bodies: true,
+        log_level: :info
+      }
     end
-  end
-end
-```
+
+Create test portal:
+
+    class TestPortal < Turbovax::Portal
+      name "Gotham City Clinic"
+      key "gotham_city"
+      public_url "https://www.turbovax.info/"
+      api_url "http://api.turbovax.info/v1/test.json"
+      request_http_method Turbovax::Constants::GET_REQUEST_METHOD
+
+      parse_response do |response|
+        response_json = JSON.parse(response)
+        Array(response_json["appointments"]).map do |location_json|
+          appointments = Array(location_json["slots"]).map do |appointment_string|
+            {
+              time: DateTime.parse(appointment_string)
+            }
+          end
+
+          Turbovax::Location.new(
+            id: "ID",
+            name: location_json["clinic_name"],
+            full_address: location_json["area"],
+            time_zone: "America/New_York",
+            data: {
+              vaccine_types: [location_json["vaccine"]],
+              appointments: appointments,
+            }
+          )
+        end
+      end
+    end
+
 Execute operation:
-```
-locations = Turbovax::DataFetcher.new(TestPortal, twitter_handler: Turbovax::Handlers::LocationHandler).execute!
-```
+
+    locations = Turbovax::DataFetcher.new(TestPortal, twitter_handler: Turbovax::Handlers::LocationHandler).execute!
 
 ## Development
 
@@ -89,4 +88,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/hugem/turbovax-gem. 
+Bug reports and pull requests are welcome on GitHub at https://github.com/hugem/turbovax-gem.

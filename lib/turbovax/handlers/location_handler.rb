@@ -4,7 +4,7 @@ require "twitter"
 
 module Turbovax
   module Handlers
-    # Given a list of locations, tweet appointment info
+    # Given a list of locations, tweet appointment info for each location
     class LocationHandler
       def initialize(locations)
         @locations = locations
@@ -34,20 +34,24 @@ module Turbovax
         3
       end
 
+      # Format of each individual date. See APIdoc for format
       # https://apidock.com/ruby/DateTime/strftime
-      # Wed, 21 Apr 2021 09:23:15 -0400 => Apr 21
+      # @example Datetime to default time format
+      #   Wed, 21 Apr 2021 09:23:15 -0400 => Apr 21
       def date_format
         "%b %-e"
       end
 
+      # Format of each individual appointment time. See APIdoc for format
       # https://apidock.com/ruby/DateTime/strftime
-      # Wed, 21 Apr 2021 09:23:15 -0400 => 9:23AM
+      # @example Datetime to default time format
+      #   Wed, 21 Apr 2021 09:23:15 -0400 => 9:23AM
       def appointment_time_format
         "%-l:%M%p"
       end
 
       # @return [Boolean]
-      # override to add caching logic
+      # Override this method to to add caching logic
       def should_tweet_for_location(location)
         location.available
       end
