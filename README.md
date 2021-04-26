@@ -15,6 +15,8 @@ Detailed docs can be found at [https://rubydoc.info/github/hugem/turbovax-gem](h
 
 This gem should only be used for the purposes of improving accessibility to vaccines and not for private gain.
 
+This is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Intuit, Inc or any of its subsidiaries or its affiliates. The names TurboTax as well as related names, marks, emblems and images are registered trademarks of their respective owners.
+
 ## Installation
 
 Add this line to your application's Gemfile:
