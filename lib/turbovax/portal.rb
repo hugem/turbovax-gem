@@ -6,13 +6,13 @@ module Turbovax
   # Captures configuration required to fetch and process data from a specific vaccine website
   class Portal
     class << self
-      # @!macro [attach] definte_parameter
+      # @!macro [attach] define_parameter
       #   @method $1
       #   $3
       #   @return [$2]
       #   @example $4
       #     $5
-      def self.definte_parameter(
+      def self.define_parameter(
         attribute, _doc_return_type, _explanation = nil, _explanation = nil,
         _example = nil
       )
@@ -39,25 +39,25 @@ module Turbovax
         end
       end
 
-      definte_parameter :name, String, "Full name of portal", "Name",
-                        "'New York City Vaccine Website'"
-      definte_parameter :key, String, "Unique identifier for portal", "Key", "'nyc_vax'"
-      definte_parameter :public_url,
-                        String,
-                        "Link to public facing website", "Full URL",
-                        "'https://www.turbovax.info/'"
+      define_parameter :name, String, "Full name of portal", "Name",
+                       "'New York City Vaccine Website'"
+      define_parameter :key, String, "Unique identifier for portal", "Key", "'nyc_vax'"
+      define_parameter :public_url,
+                       String,
+                       "Link to public facing website", "Full URL",
+                       "'https://www.turbovax.info/'"
 
-      definte_parameter :request_headers, Hash, "Key:value mapping of HTTP request headers",
-                        "Specify user agent and cookies", "{ 'user-agent': 'Mozilla/5.0', " \
+      define_parameter :request_headers, Hash, "Key:value mapping of HTTP request headers",
+                       "Specify user agent and cookies", "{ 'user-agent': 'Mozilla/5.0', " \
                         "'cookies': 'ABC' }"
-      definte_parameter :request_http_method, Symbol,
-                        "Turbovax::Constants::GET_REQUEST_METHOD or " \
-                        "Turbovax::Constants::POST_REQUEST_METHOD"
-      definte_parameter :api_url, String, "Full API URL", "Example Turbovax endpoint",
-                        "'https://api.turbovax.info/v1/dashboard'"
-      definte_parameter :api_url_variables, Hash,
-                        "Hash or block that is interpolated ",
-                        '
+      define_parameter :request_http_method, Symbol,
+                       "Turbovax::Constants::GET_REQUEST_METHOD or " \
+                       "Turbovax::Constants::POST_REQUEST_METHOD"
+      define_parameter :api_url, String, "Full API URL", "Example Turbovax endpoint",
+                       "'https://api.turbovax.info/v1/dashboard'"
+      define_parameter :api_url_variables, Hash,
+                       "Hash or block that is interpolated ",
+                       '
           api_url_variables do |extra_params|
             {
               site_id: NAME_TO_ID_MAPPING[extra_params[:name]],
@@ -71,16 +71,11 @@ module Turbovax
           #  after api_url_variables interpolation
           api_url "https://api.turbovax.info/v1/sites/8888/2021-08-08"
         '
-      # definte_parameter :request_body, Hash,
-      #                   "Hash (or block evaluates to a hash) that is used to in a POST request",
-      #                   '
-      #     request_body do |extra_params|
-      #       {
-      #         site_id: NAME_TO_ID_MAPPING[extra_params[:name]],
-      #         date: extra_params.strftime("%F"),
-      #       }
-      #     end
-      #   '
+      define_parameter :data_fetcher_params, Hash,
+                       "Extra params that are set by [Turbovax::DataFetcher]",
+                       "{ date: DateTime.now }"
+
+      attr_writer :data_fetcher_params
 
       # Block that will called after raw data is fetched from API. Must return list of Location
       # instances
@@ -161,8 +156,8 @@ module Turbovax
 
       # Calls parse_response and assigns portal to each location so user doesn't need to do
       # this by themselves
-      def parse_response_with_portal(response, extra_params)
-        parse_response(response, extra_params).map do |location|
+      def parse_response_with_portal(response)
+        parse_response(response).map do |location|
           location.portal ||= self
           location
         end

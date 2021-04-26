@@ -13,8 +13,8 @@ module Turbovax
     # @param [TurboVax::Twitter::Handler] twitter_handler a class handles if appointments are found
     # @param [Hash] extra_params other info that can be provided to portal when executing blocks
     def initialize(portal, twitter_handler: nil, extra_params: {})
+      portal.data_fetcher_params = { date: DateTime.now }.merge(extra_params)
       @portal = portal
-      @extra_params = { date: DateTime.now }.merge(extra_params)
       @conn = create_request_connection
       @twitter_handler = twitter_handler
     end
@@ -23,7 +23,7 @@ module Turbovax
     def execute!
       response = make_request
       log("make request [DONE]")
-      locations = @portal.parse_response_with_portal(response.body, @extra_params)
+      locations = @portal.parse_response_with_portal(response.body)
       log("parse response [DONE]")
 
       send_to_twitter_handler(locations)
@@ -59,7 +59,7 @@ module Turbovax
     def make_request
       request_type = @portal.request_http_method
       path = @portal.api_path
-      query_params = @portal.api_query_params(@extra_params)
+      query_params = @portal.api_query_params
 
       case request_type
       when Turbovax::Constants::GET_REQUEST_METHOD
@@ -84,7 +84,7 @@ module Turbovax
         # only set params if they are present, otherwise this will overwrite any string query
         # param values that are existing in the url path
         req.params = query_params if query_params.nil? || query_params != {}
-        req.body = @portal.request_body(@extra_params)
+        req.body = @portal.request_body
       end
     end
 

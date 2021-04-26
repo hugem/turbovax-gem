@@ -11,9 +11,8 @@ Gem::Specification.new do |spec|
 
   spec.summary       = "Quickly build vaccine twitter bots"
   spec.description   = spec.summary
-  spec.homepage      = "https://github.com/hugem/turbovax-gem"
+  spec.homepage      = "https://www.turbovax.info/"
   spec.required_ruby_version = Gem::Requirement.new(">= 2.5.0")
-
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/hugem/turbovax-gem"
