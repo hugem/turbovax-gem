@@ -7,6 +7,10 @@ Turbovax gem helps you quickly stand up bots that can:
 
 It does not provide any data storage or web server layers. You can build that functionality on top of the gem by yourself.
 
+## Documentation
+
+Detailed docs can be found at [https://rubydoc.info/github/hugem/turbovax-gem](https://rubydoc.info/github/hugem/turbovax-gem).
+
 ## Disclaimer
 
 This gem should only be used for the purposes of improving accessibility to vaccines and not for private gain.
@@ -26,6 +30,7 @@ And then execute:
 Or install it yourself as:
 
     $ gem install turbovax
+
 
 ## Development
 
