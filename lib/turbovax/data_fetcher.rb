@@ -11,9 +11,10 @@ module Turbovax
   class DataFetcher
     # @param [Turbovax::Portal] portal
     # @param [TurboVax::Twitter::Handler] twitter_handler a class handles if appointments are found
+    # @param [DateTime] date sets request to specific date when specified
     # @param [Hash] extra_params other info that can be provided to portal when executing blocks
-    def initialize(portal, twitter_handler: nil, extra_params: {})
-      portal.data_fetcher_params = { date: DateTime.now }.merge(extra_params)
+    def initialize(portal, twitter_handler: nil, date: nil, extra_params: {})
+      portal.data_fetcher_params = { date: date || DateTime.now }.merge(extra_params)
       @portal = portal
       @conn = create_request_connection
       @twitter_handler = twitter_handler

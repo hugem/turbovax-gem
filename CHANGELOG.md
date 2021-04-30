@@ -1,3 +1,6 @@
+# 0.0.4
+- Add `notes` method to `Portal`
+
 # 0.0.3
 - Updated docs
 - Improve how data fetcher params are provided to Portal methods

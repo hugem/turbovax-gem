@@ -74,6 +74,8 @@ module Turbovax
       define_parameter :data_fetcher_params, Hash,
                        "Extra params that are set by [Turbovax::DataFetcher]",
                        "{ date: DateTime.now }"
+      define_parameter :notes, String,
+                       "Extra info for users"
 
       attr_writer :data_fetcher_params
 
