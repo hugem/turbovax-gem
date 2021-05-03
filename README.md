@@ -5,7 +5,7 @@ Turbovax gem helps you quickly stand up bots that can:
 2) tweet appointment data
 3) return structured appointment data
 
-It does not provide any data storage or web server layers. You can build that functionality on top of the gem by yourself.
+**Note: the gem does not provide data storage or web server functionality on its own. Please see [turbovax-web](https://github.com/hugem/turbovax-web) repo for an example of how to build those layers on top of the gem.**
 
 ## Survey Request
 
